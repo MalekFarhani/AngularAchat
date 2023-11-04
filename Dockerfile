@@ -32,4 +32,4 @@ FROM base AS final
 # Copy the Angular app build from the fetch stage
 COPY --from=fetch /app /usr/share/nginx/html
 
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
