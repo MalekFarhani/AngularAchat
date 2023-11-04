@@ -25,6 +25,7 @@ RUN curl -o app.zip -L "http://192.168.222.133:8081/repository/achatfront/achat/
 # Unzip the app build into the /app directory
 RUN unzip app.zip -d /app
 
+RUN ls -l
 # Use the Nginx image as the final stage
 FROM base AS final
 
