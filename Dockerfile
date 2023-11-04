@@ -14,7 +14,7 @@ EXPOSE 80
 FROM alpine:3.14 AS fetch
 
 # Install the unzip utility (using apk in an Alpine-based image)
-RUN apk update && apk add unzip
+RUN apk update && apk add unzip && apk add curl unzip
 
 # Create a directory to store the app build files
 RUN mkdir /app
