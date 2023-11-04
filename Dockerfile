@@ -11,7 +11,7 @@ COPY nginx.conf /etc/nginx/conf.d/
 EXPOSE 80
 
 # Use a multi-stage build to keep the final image small
-#FROM openjdk:19 AS fetch
+FROM openjdk:19 AS fetch
 
 # Install the unzip utility
 RUN apt-get update && apt-get install -y unzip
@@ -29,4 +29,4 @@ RUN unzip app.zip -d /app
 FROM base AS final
 
 # Copy the Angular app build from the fetch stage
-COPY --from=base /app /usr/share/nginx/html
+COPY --from=fetch /app /usr/share/nginx/html
