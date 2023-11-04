@@ -27,6 +27,6 @@ RUN ls -l
 # Use the Nginx image as the final stage
 
 # Copy the Angular app build from the fetch stage
-COPY /app /usr/share/nginx/html
+COPY /app/ /usr/share/nginx/html
 
 CMD ["nginx", "-g", "daemon off;"]
