@@ -20,7 +20,7 @@ RUN apk update && apk add unzip && apk add curl unzip
 RUN mkdir /app
 
 # Download the Angular app build from Nexus
-RUN curl -o app.zip -L "http://192.168.222.133:8081/repository/achatfront/achat/1.0.0/-1.0.0.achat.zip"
+RUN curl -o app.zip -L "http://192.168.222.133:8081/repository/achatfront/achat/1.5.0/-1.5.0.achat.zip"
 
 # Unzip the app build into the /app directory
 RUN unzip app.zip -d /app
