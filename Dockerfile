@@ -11,7 +11,7 @@ COPY nginx.conf /etc/nginx/conf.d/
 EXPOSE 80
 
 # Install the unzip utility (using apk in an Alpine-based image)
-RUN apt-get update && apt-get install unzip && apt-get install curl
+RUN apt-get update && apt-get install unzip -y && apt-get install curl -y
 
 # Create a directory to store the app build files
 
