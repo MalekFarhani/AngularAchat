@@ -13,8 +13,8 @@ EXPOSE 80
 # Use a multi-stage build to keep the final image small
 FROM openjdk:19 AS fetch
 
-# Install the unzip utility
-RUN apt-get update && apt-get install -y unzip
+# Install the unzip utility (using apk in an Alpine-based image)
+RUN apk update && apk add unzip
 
 # Create a directory to store the app build files
 RUN mkdir /app
