@@ -38,7 +38,7 @@ stages{
                     ]
                 ],
                 credentialsId: 'nexus-cred',
-                groupId: 'achat',
+                groupId: 'achatconfig',
                 version: "1.0.0",
                 nexusUrl: '192.168.222.133:8081',
                 nexusVersion: 'nexus3',
