@@ -12,10 +12,10 @@ RUN unzip -o app.zip -d /usr/share/nginx/html
 RUN rm app.zip
 
 # Download nginx.conf.zip
-RUN curl -o nginx.conf.zip -L "http://192.168.222.133:8081/repository/achatfront/achat/nginx-config/1.0.0/nginx-config-1.0.0.conf.zip"
+RUN curl -o nginx.conf -L "http://192.168.222.133:8081/repository/achatfront/achat/nginx-config/1.0.0/nginx-config-1.0.0.conf"
 
 # Extract nginx.conf.zip
-RUN unzip -o nginx.conf.zip -d /etc/nginx/conf.d
+RUN mv /tmp/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 # Clean up nginx.conf.zip
 RUN rm nginx.conf.zip
