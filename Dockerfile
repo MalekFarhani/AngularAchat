@@ -2,12 +2,12 @@ FROM nginx:1.21
 
 RUN apt-get update && apt-get install unzip -y && apt-get install curl -y
 
-RUN curl -o /tmp/app.zip -L "http://192.168.222.133:8081/repository/achatfront/achat/1.0.0/-1.0.0.achat.zip" && \
+RUN curl -o /tmp/app.zip -L "http://192.168.222.133:8081/repository/achatfront/front-build/1.0.0/front-build-1.0.0.achat.zip" && \
     unzip -o /tmp/app.zip -d /usr/share/nginx/html && \
     rm /tmp/app.zip
 
 
-RUN curl -o /tmp/nginx.conf.zip -L "http://192.168.222.133:8081/repository/achatfront/achat/1.0.0/nginx-config.zip" && \
+RUN curl -o /tmp/nginx.conf.zip -L "http://192.168.222.133:8081/repository/achatfront/achat/nginx-config/1.0.0/nginx-config-1.0.0.conf.zip" && \
     unzip -o /tmp/nginx.conf.zip -d /etc/nginx/conf.d && \
     rm /tmp/nginx.conf.zip
 

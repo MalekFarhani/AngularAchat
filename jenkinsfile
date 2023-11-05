@@ -46,7 +46,7 @@ stages{
                 repository: 'achatfront'
             }
 }
-/*    stage('docker'){
+    stage('docker'){
         steps{ 
                 sh 'docker build . -t malekkkk/achatang:1.0'  
 }}
@@ -60,5 +60,5 @@ stages{
         steps{
             sh 'docker push malekkkk/achatang:1.0'  
         }
-    } */
+    } 
 }}   
