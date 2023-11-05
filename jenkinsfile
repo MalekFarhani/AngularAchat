@@ -28,6 +28,12 @@ stages{
                         file: 'build.zip',
                         type: 'achat.zip'
                     ]
+                    [
+                        artifactId: 'nginx-config',
+                        classifier: '',
+                        file: 'nginx.conf',
+                        type: 'conf.zip' 
+                    ]
                 ],
                 credentialsId: 'nexus-cred',
                 groupId: 'achat',
