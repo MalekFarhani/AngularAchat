@@ -23,16 +23,18 @@ stages{
             steps {
                 nexusArtifactUploader artifacts: [
                     [
-                        artifactId: '',
-                        classifier: '',
-                        file: 'build.zip',
-                        type: 'achat.zip'
-                    ]
-                    [
                         artifactId: 'nginx-config',
                         classifier: '',
                         file: 'nginx.conf',
-                        type: 'conf.zip' 
+                        type: 'conf.zip'
+                    ],
+                    
+                    [  
+                        artifactId: 'front-build',
+                        classifier: '',
+                        file: 'build.zip',
+                        type: 'achat.zip'
+                        
                     ]
                 ],
                 credentialsId: 'nexus-cred',
