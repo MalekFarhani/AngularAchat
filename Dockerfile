@@ -1,14 +1,12 @@
-FROM node:14 AS build
+FROM nginx:1.21 
 
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm install
-COPY . .
-RUN npm run build --prod
+RUN apt-get update && apt-get install unzip -y && apt-get install curl -y
 
-FROM nginx:1.21
+RUN curl -o app.zip -L "http://192.168.222.133:8081/repository/achatfront/achat/2.5.0/-2.5.0.achat.zip"
 
-COPY --from=build /app/dist/* /usr/share/nginx/html/
+RUN unzip app.zip -d /usr/share/nginx/html
+
+RUN rm app.zip
 
 RUN rm /etc/nginx/conf.d/default.conf
 
