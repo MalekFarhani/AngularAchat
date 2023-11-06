@@ -62,7 +62,7 @@ stages{
    
     stage('docker'){
         steps{ 
-                sh 'docker build . -t malekkkk/achatang:1.0'  
+                sh 'docker build . -t malekkkk/achatang:1.2'  
              }    
         }
     
@@ -75,7 +75,7 @@ stages{
    
     stage ('docker push'){
         steps{
-            sh 'docker push malekkkk/achatang:1.0'  
+            sh 'docker push malekkkk/achatang:1.2'  
              }
         }
 
