@@ -12,7 +12,7 @@ stages{
     stage('pulling the code')
         {
             steps{
-                git branch: 'main', 
+                git branch: 'prod', 
                 url: 'https://github.com/MalekFarhani/AngularAchat'
                  }   
         }
@@ -24,13 +24,6 @@ stages{
                  }
         }
     
- /*
-    stage('TRIVY FS SCAN') {
-            steps{
-                sh "trivy fs . > trivyfs.txt"
-                 }
-        } 
-    */
     stage("build"){
             steps {
             sh "CI=false npm run build"
@@ -85,10 +78,5 @@ stages{
             sh 'docker push malekkkk/achatang:1.0'  
              }
         }
-/*
-    stage("TRIVY IMAGE Scan"){
-            steps{
-                sh "trivy image malekkkk/achatang:1.0 > trivyimage.txt" 
-                 }
-        } */
+
 }}   
