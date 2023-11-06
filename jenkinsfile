@@ -2,12 +2,12 @@ pipeline{
     agent any
 
 stages{
- /*   stage('clean workspace')
+    stage('clean workspace')
         {
             steps{
                 cleanWs()
                  }
-        } */
+        } 
 
     stage('pulling the code')
         {
@@ -23,14 +23,19 @@ stages{
             sh "npm install"
                  }
         }
-    
- /*
+    stage('OWASP FS SCAN') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+ 
     stage('TRIVY FS SCAN') {
             steps{
                 sh "trivy fs . > trivyfs.txt"
                  }
         } 
-    */
+    
     stage("build"){
             steps {
             sh "CI=false npm run build"
@@ -85,10 +90,10 @@ stages{
             sh 'docker push malekkkk/achatang:1.0'  
              }
         }
-/*
+
     stage("TRIVY IMAGE Scan"){
             steps{
                 sh "trivy image malekkkk/achatang:1.0 > trivyimage.txt" 
                  }
-        } */
+        } 
 }}   
