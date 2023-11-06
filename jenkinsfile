@@ -71,5 +71,11 @@ stages{
         steps{
             sh 'docker push malekkkk/achatang:1.0'  
         }
-    } 
+    }
+
+    stage("TRIVY IMAGE Scan"){
+            steps{
+                sh "trivy image malekkkk/achatang:1.0 > trivyimage.txt" 
+            }
+        } 
 }}   
