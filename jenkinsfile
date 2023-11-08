@@ -26,7 +26,7 @@ stages{
                     sh "chmod +x setup-aks.sh"
                     sh "./setup-aks.sh"
                     sh "az account set --subscription 2600ef59-0249-4a9f-af1c-68655b8143bf"
-                    sh "az aks get-credentials --resource-group maRessourceGroup --name maAKSCluster"
+                    sh "az aks get-credentials --resource-group malekRessourceGroup --name malekAKSCluster"
                     sh "kubectl apply -f mysql-dep.yml"
                     sleep(time: 20, unit: 'SECONDS')
                     sh "kubectl apply -f mysql-svc.yml"  
