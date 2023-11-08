@@ -2,35 +2,81 @@ pipeline{
     agent any
 
 stages{
- /*   stage('clean workspace')
+   stage('clean workspace')
         {
             steps{
                 cleanWs()
                  }
-        } */
+        } 
 
     stage('pulling the code')
         {
             steps{
-                git branch: 'main', 
+                git branch: 'prod', 
                 url: 'https://github.com/MalekFarhani/AngularAchat'
                  }   
         }
     
+    stage('Terraform Init and Apply') {
+            steps {
+                    sh "chmod +x setup-aks.sh"
+                    sh "./setup-aks.sh"
+                    sh "az account set --subscription 2600ef59-0249-4a9f-af1c-68655b8143bf"
+                    sh "az aks get-credentials --resource-group mRessourceGroup --name mAKSCluster"
+                    sh "kubectl apply -f mysql-dep.yml"
+                    sleep(time: 120, unit: 'SECONDS')
+                    sh "kubectl apply -f mysql-svc.yml"  
+                    sh "kubectl get pods"
+                    sh "kubectl get services"
+                    sh "kubectl apply -f back-dep.yml"
+                    sleep(time: 180, unit: 'SECONDS')
+                    sh "kubectl apply -f back-svc.yml" 
+                    sh "kubectl get pods"
+                    sh "kubectl get services" 
+                    }}
+stage('Replace URL in Angular Service') {
+    steps {
+        script {
+            def serviceName = 'spring-boot-service'
+            def springBootPort = 8089
+            
+            def nodeIPs = sh(script: "kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type==\"InternalIP\")].address}'", returnStdout: true).trim().split(' ')
+
+            def springBootServiceIP = null
+
+            for (nodeIP in nodeIPs) {
+                def cmd = "nc -zv ${nodeIP} ${springBootPort}"
+                def result = sh(script: cmd, returnStatus: true)
+                if (result == 0) {
+                    springBootServiceIP = nodeIP
+                    break
+                }
+            }
+
+            if (springBootServiceIP) {
+                echo "Spring Boot service is available at IP: ${springBootServiceIP}:${springBootPort}"
+                
+                def replaceCommand = "sed -i 's|http://localhost:4000|http://${springBootServiceIP}:${springBootPort}|g' src/app/shared/service/Reglement.service.ts"
+                sh returnStatus: true, script: replaceCommand
+
+                if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
+                    echo "URL replacement was successful."
+                } else {
+                    error "URL replacement failed."
+                }
+            } else {
+                error "Spring Boot service IP not found"
+            }
+        }
+    }
+}
+  
     stage("install")
         {
             steps{
             sh "npm install"
                  }
         }
-    
- /*
-    stage('TRIVY FS SCAN') {
-            steps{
-                sh "trivy fs . > trivyfs.txt"
-                 }
-        } 
-    */
     stage("build"){
             steps {
             sh "CI=false npm run build"
@@ -69,10 +115,15 @@ stages{
    
     stage('docker'){
         steps{ 
-                sh 'docker build . -t malekkkk/achatang:1.0'  
+                sh 'docker build . -t malekkkk/achatang:3.0'  
              }    
         }
-    
+    stage ('cleaning cache'){
+        steps{
+                sh 'docker builder prune'
+        }
+    }
+
     stage('docker login'){
         steps {
                 withCredentials([string(credentialsId: 'dockerhu', variable: 'dockerhubpwd')]) {      
@@ -82,13 +133,14 @@ stages{
    
     stage ('docker push'){
         steps{
-            sh 'docker push malekkkk/achatang:1.0'  
+            sh 'docker push malekkkk/achatang:3.0'  
              }
         }
-/*
-    stage("TRIVY IMAGE Scan"){
-            steps{
-                sh "trivy image malekkkk/achatang:1.0 > trivyimage.txt" 
-                 }
-        } */
-}}   
+    stage ('deploy the angular app')
+        steps {
+            sh 'kubetcl apply -f front-dep.yml'
+            sleep(time: 120, unit: 'SECONDS')
+            sh 'kubectl apply -f front-svc.yml'
+            sh 'kubectl get pods'
+        }
+}}
