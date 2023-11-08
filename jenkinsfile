@@ -136,11 +136,12 @@ stage('Replace URL in Angular Service') {
             sh 'docker push malekkkk/achatang:3.0'  
              }
         }
-    stage ('deploy the angular app')
+    stage ('deploy the angular app') {
         steps {
             sh 'kubetcl apply -f front-dep.yml'
             sleep(time: 120, unit: 'SECONDS')
             sh 'kubectl apply -f front-svc.yml'
             sh 'kubectl get pods'
-        }
+            sh 'kubectl get services'
+        }}
 }}
