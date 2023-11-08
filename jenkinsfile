@@ -1,6 +1,10 @@
 pipeline{
     agent any
-
+environment {
+        SERVICE_NAME = 'spring-boot-service' // The name of your NodePort service
+        SERVICE_PORT = 8089 // The port on which your service is exposed
+        ANGULAR_SERVICE_FILE = 'src/app/shared/service/Reglement.service.ts' // The path to your Angular service file
+    }
 stages{
    stage('clean workspace')
         {
@@ -34,42 +38,40 @@ stages{
                     sh "kubectl get pods"
                     sh "kubectl get services" 
                     }}
-stage('Replace URL in Angular Service') {
-    steps {
-        script {
-            def serviceName = 'spring-boot-service'
-            def springBootPort = 8089
-            
-            def nodeIPs = sh(script: "kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type==\"InternalIP\")].address}'", returnStdout: true).trim().split(' ')
+stage('Get Spring Boot Service IP') {
+            steps {
+                script {
+                    def nodePortServiceInfo = sh(script: "kubectl get svc ${SERVICE_NAME} -o json", returnStdout: true).trim()
+                    def serviceIPs = readJSON text: nodePortServiceInfo
+                    def nodePort = serviceIPs.spec.ports.find { it.port == SERVICE_PORT }?.nodePort
 
-            def springBootServiceIP = null
-
-            for (nodeIP in nodeIPs) {
-                def cmd = "nc -zv ${nodeIP} ${springBootPort}"
-                def result = sh(script: cmd, returnStatus: true)
-                if (result == 0) {
-                    springBootServiceIP = nodeIP
-                    break
+                    if (nodePort) {
+                        echo "Spring Boot service is accessible via NodePort: ${nodePort}"
+                    } else {
+                        error "NodePort for Spring Boot service not found"
+                    }
                 }
-            }
-
-            if (springBootServiceIP) {
-                echo "Spring Boot service is available at IP: ${springBootServiceIP}:${springBootPort}"
-                
-                def replaceCommand = "sed -i 's|http://localhost:4000|http://${springBootServiceIP}:${springBootPort}|g' src/app/shared/service/Reglement.service.ts"
-                sh returnStatus: true, script: replaceCommand
-
-                if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
-                    echo "URL replacement was successful."
-                } else {
-                    error "URL replacement failed."
-                }
-            } else {
-                error "Spring Boot service IP not found"
             }
         }
-    }
-}
+
+        stage('Replace URL in Angular Service') {
+            steps {
+                script {
+                    def nodePort = sh(script: "kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type==\"InternalIP\")].address}'", returnStdout: true).trim()
+                    def oldURL = "http://localhost:${SERVICE_PORT}" // Old URL to replace
+                    def newURL = "http://${nodePort}:${SERVICE_PORT}" // New URL with the retrieved IP
+
+                    // Replace the URL in the Angular service file
+                    def replaceCommand = "sed -i 's|${oldURL}|${newURL}|g' ${ANGULAR_SERVICE_FILE}"
+                    sh returnStatus: true, script: replaceCommand
+
+                    if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
+                        echo "URL replacement was successful."
+                    } else {
+                        error "URL replacement failed."
+                    }
+                }
+            }}
   
     stage("install")
         {
