@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: achatfront
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: achatfront
+  template:
+    metadata:
+      labels:
+        app: achatfront
+    spec:
+      containers:
+        - name: achatfront
+          image: malekkkk/achatang:1.2
+          ports:
+            - containerPort: 80

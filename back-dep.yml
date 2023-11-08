@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: achatback
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: achatback
+  template:
+    metadata:
+      labels:
+        app: achatback
+    spec:
+      containers:
+        - name: achtback
+          image: malekkkk/achat:3.2
+          ports:
+            - containerPort: 8089
