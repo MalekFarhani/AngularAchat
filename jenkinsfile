@@ -12,7 +12,7 @@ stages{
     stage('pulling the code')
         {
             steps{
-                git branch: 'prod', 
+                git branch: 'main', 
                 url: 'https://github.com/MalekFarhani/AngularAchat'
                  }   
         }
