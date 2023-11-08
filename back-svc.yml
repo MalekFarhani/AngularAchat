@@ -3,7 +3,6 @@ kind: Service
 metadata:
   name: spring-boot-service
 spec:
-  type: NodePort
   selector:
     app: achatback
   ports:
