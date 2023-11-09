@@ -2,12 +2,12 @@ pipeline{
     agent any
 
 stages{
-    stage('clean workspace')
+   /* stage('clean workspace')
         {
             steps{
                 cleanWs()
                  }
-        } 
+        } */
 
     stage('pulling the code')
         {
@@ -17,85 +17,7 @@ stages{
                  }   
         }
     
-    stage("install")
-        {
-            steps{
-            sh "npm install"
-                 }
-        }
-    stage('OWASP FS SCAN') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
- 
-    stage('TRIVY FS SCAN') {
-            steps{
-                sh "trivy fs . > trivyfs.txt"
-                 }
-        } 
-    
-    stage("build"){
-            steps {
-            sh "CI=false npm run build"
-            sh "ls -l"
-            sh "zip -j -r build.zip dist/crudtuto-Front/*"
-                  }
-        }
- 
-    stage('Publish to Nexus') {
-            steps {
-                nexusArtifactUploader artifacts: [
-                    [
-                        artifactId: 'nginx-config',
-                        classifier: '',
-                        file: 'nginx.conf',
-                        type: ''
-                    ],
-                    
-                    [  
-                        artifactId: 'front-build',
-                        classifier: '',
-                        file: 'build.zip',
-                        type: 'achat.zip'
-                        
-                    ]
-                ],
-                credentialsId: 'nexus-cred',
-                groupId: 'achatconfig',
-                version: "1.0.0",
-                nexusUrl: '192.168.222.133:8081',
-                nexusVersion: 'nexus3',
-                protocol: 'http',
-                repository: 'achatfront'
-                 }
-        }
    
-    stage('docker'){
-        steps{ 
-                sh 'docker build . -t malekkkk/achatfdev:1.0'  
-             }    
-        }
-    
-    stage('docker login'){
-        steps {
-                withCredentials([string(credentialsId: 'dockerhu', variable: 'dockerhubpwd')]) {      
-                        sh "echo \$dockerhubpwd | docker login -u malekkkk --password-stdin"}
-              }
-        }
-   
-    stage ('docker push'){
-        steps{
-            sh 'docker push malekkkk/achatfdev:1.0'  
-             }
-        }
-
-    stage("TRIVY IMAGE Scan"){
-            steps{
-                sh "trivy image malekkkk/achatfdev:1.0 > trivyimage.txt" 
-                 }
-        } 
 }
   post {
      always {
