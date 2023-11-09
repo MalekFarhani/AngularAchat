@@ -12,7 +12,7 @@ stages{
     stage('pulling the code')
         {
             steps{
-                git branch: 'main', 
+                git branch: 'dev', 
                 url: 'https://github.com/MalekFarhani/AngularAchat'
                  }   
         }
@@ -74,7 +74,7 @@ stages{
    
     stage('docker'){
         steps{ 
-                sh 'docker build . -t malekkkk/achatang:1.0'  
+                sh 'docker build . -t malekkkk/achatfdev:1.0'  
              }    
         }
     
@@ -87,13 +87,25 @@ stages{
    
     stage ('docker push'){
         steps{
-            sh 'docker push malekkkk/achatang:1.0'  
+            sh 'docker push malekkkk/achatfdev:1.0'  
              }
         }
 
     stage("TRIVY IMAGE Scan"){
             steps{
-                sh "trivy image malekkkk/achatang:1.0 > trivyimage.txt" 
+                sh "trivy image malekkkk/achatfdev:1.0 > trivyimage.txt" 
                  }
         } 
-}}   
+}
+  post {
+     always {
+        emailext attachLog: true,
+            subject: "'${currentBuild.result}'",
+            body: "Project: ${env.JOB_NAME}<br/>" +
+                "Build Number: ${env.BUILD_NUMBER}<br/>" +
+                "URL: ${env.BUILD_URL}<br/>",
+            to: 'devopsteam1009@gmail.com',
+            attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+        }
+    }
+}   
