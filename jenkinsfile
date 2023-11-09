@@ -97,11 +97,7 @@ stage("install")
                 sh "trivy image malekkkk/achatfdev:1.0 > trivyimage.txt" 
                  }
         } 
-    stage ('clean local repo') {
-        steps{
-            sh 'docker builder prune -y'
-        }
-    }
+  
 }}      
 
   post {
