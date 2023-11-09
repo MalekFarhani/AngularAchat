@@ -5,7 +5,7 @@ import {HttpClient} from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
-export class OperateurService {
+export class ReglementService {
   readonly API_URL = 'http://192.168.222.133:8089/SpringMVC/reglement';
 
   constructor(private httpClient: HttpClient) {
