@@ -99,6 +99,7 @@ stages{
 }
   post {
      always {
+        script {
         def owaspFsScanReportPath = "${env.WORKSPACE}/dependency-check-report.xml"
         emailext attachLog: true,
             subject: "'${currentBuild.result}'",
@@ -107,6 +108,6 @@ stages{
                 "URL: ${env.BUILD_URL}<br/>",
             to: 'devopsteam1009@gmail.com',
             attachmentsPattern: "trivyfs.txt,trivyimage.txt,${owaspFsScanReportPath}"
-        }
+        }}
     }
 }   
