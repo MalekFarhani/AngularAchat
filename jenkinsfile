@@ -94,7 +94,7 @@ stage("install")
 
     stage("TRIVY IMAGE Scan"){
             steps{
-                sh "trivy image malekkkk/achatang:1.0 > trivyimage.txt" 
+                sh "trivy image malekkkk/achatfdev:1.0 > trivyimage.txt" 
                  }
         } 
     stage ('clean local repo') {
