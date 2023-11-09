@@ -100,7 +100,7 @@ stages{
   post {
      always {
         script {
-        def owaspFsScanReportPath = "${env.WORKSPACE}/dependency-check-report.xml"
+        def owaspFsScanReportPath = "**/dependency-check-report.xml"
         emailext attachLog: true,
             subject: "'${currentBuild.result}'",
             body: "Project: ${env.JOB_NAME}<br/>" +
