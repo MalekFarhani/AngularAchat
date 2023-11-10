@@ -17,12 +17,14 @@ stages{
                  }   
         }
     
-    stage('Terraform Init and Apply') {
+    stage('Aks Provisioning with Terraform') {
             steps {
                     sh "chmod +x setup-aks.sh"
-                    sh "./setup-aks.sh"
-                    sh "az account set --subscription 2600ef59-0249-4a9f-af1c-68655b8143bf"
-                    sh "az aks get-credentials --resource-group lastRessourceGroup --name lastAKSCluster"
+                    sh "./setup-aks.sh" 
+                    }}
+    
+    stage('Deploying mysql and The Backend') { 
+            steps {                
                     sh "kubectl apply -f mysql-dep.yml"
                     sleep(time: 20, unit: 'SECONDS')
                     sh "kubectl apply -f mysql-svc.yml"  
@@ -33,7 +35,8 @@ stages{
                     sh "kubectl apply -f back-svc.yml" 
                     sh "kubectl get pods"
                     sh "kubectl get services" 
-                    }}
+                   }} 
+   
     stage('Get Spring Boot Service External IP') {
     steps {
         script {
@@ -98,7 +101,7 @@ stages{
             def externalIP = ''
 
             while (externalIP.isEmpty() && retryCount < maxRetries) {
-                // Check for the external IP of the Angular service
+                
                 externalIP = sh(script: "kubectl get svc ${serviceName} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'", returnStdout: true).trim()
                 if (externalIP.isEmpty()) {
                     echo "External IP for Angular service not found. Retrying in 30 seconds..."
@@ -108,8 +111,8 @@ stages{
             }
 
             if (externalIP) {
-                echo "External IP for Angular service: ${externalIP}"
-                // Display the link or perform further actions
+                echo "External IP for Angular service: http://${externalIP}:80"
+                
             } else {
                 error "External IP for Angular service not found after ${maxRetries} retries."
             }

@@ -1,9 +1,13 @@
-# Provision the AKS cluster with Terraform
+
 terraform init
 terraform apply -auto-approve
 
-# Export the KUBECONFIG environment variable
+
 export KUBECONFIG=$(terraform output kube_config)
 
-# Display the AKS cluster name
+
 echo "AKS Cluster Name: $(terraform output cluster_name)"
+
+az account set --subscription 2600ef59-0249-4a9f-af1c-68655b8143bf
+
+az aks get-credentials --resource-group lastRessourceGroup --name lastAKSCluster
