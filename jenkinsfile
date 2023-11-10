@@ -59,7 +59,7 @@ stages{
                 sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Reglement.service.ts"
                 sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Secteur-activite.service.ts"
                 sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Stock.service.ts"
-
+                sh 'cat src/app/shared/Service/Stock.service.ts'
             } else {
                 error "External IP for Spring Boot service not found after ${maxRetries} retries."
             }
