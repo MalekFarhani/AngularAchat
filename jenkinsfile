@@ -1,8 +1,13 @@
 pipeline{
     agent any
 
+environment {
+        SERVICE_NAME = 'spring-boot-service' // The name of your NodePort service
+        SERVICE_PORT = 8089 // The port on which your service is exposed
+        ANGULAR_SERVICE_FILE = 'src/app/shared/Service/Reglement.service.ts' // The path to your Angular service file
+    }
 stages{
-    stage('clean workspace')
+   stage('clean workspace')
         {
             steps{
                 cleanWs()
@@ -16,7 +21,24 @@ stages{
                 url: 'https://github.com/MalekFarhani/AngularAchat'
                  }   
         }
-   
+    
+    stage('Terraform Init and Apply') {
+            steps {
+                    sh "chmod +x setup-aks.sh"
+                    sh "./setup-aks.sh"
+                    sh "az account set --subscription 2600ef59-0249-4a9f-af1c-68655b8143bf"
+                    sh "az aks get-credentials --resource-group dudaRessourceGroup --name dudaAKSCluster"
+                    sh "kubectl apply -f mysql-dep.yml"
+                    sleep(time: 20, unit: 'SECONDS')
+                    sh "kubectl apply -f mysql-svc.yml"  
+                    sh "kubectl get pods"
+                    sh "kubectl get services"
+                    sh "kubectl apply -f back-dep.yml"
+                    sleep(time: 20, unit: 'SECONDS')
+                    sh "kubectl apply -f back-svc.yml" 
+                    sh "kubectl get pods"
+                    sh "kubectl get services" 
+                    }}
     stage('docker'){
         steps{ 
                 sh 'docker build . -t malekkkk/achatang:2.0'  
