@@ -1,18 +1,13 @@
 pipeline{
     agent any
 
-environment {
-        SERVICE_NAME = 'spring-boot-service' // The name of your NodePort service
-        SERVICE_PORT = 8089 // The port on which your service is exposed
-        ANGULAR_SERVICE_FILE = 'src/app/shared/Service/Reglement.service.ts' // The path to your Angular service file
-    }
 stages{
-   stage('clean workspace')
+ /*  stage('clean workspace')
         {
             steps{
                 cleanWs()
                  }
-        } 
+        } */
 
     stage('pulling the code')
         {
@@ -58,7 +53,13 @@ stages{
 
             if (externalIP) {
                 echo "External IP for Spring Boot service: ${externalIP}"
+                sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Facture.service.ts"
+                sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Operateur.service.ts"
+                sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Product.service.ts"
                 sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Reglement.service.ts"
+                sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Secteur-activite.service.ts"
+                sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Stock.service.ts"
+
             } else {
                 error "External IP for Spring Boot service not found after ${maxRetries} retries."
             }
@@ -85,12 +86,35 @@ stages{
              }
         }
 
-    stage('angular'){
-        steps{ 
-                    sh "kubectl apply -f front-dep.yml"
-                    sleep(time: 20, unit: 'SECONDS')
-                    sh "kubectl apply -f front-svc.yml" 
-             }    
+   stage('angular') {
+    steps {
+        script {
+            sh "kubectl apply -f front-dep.yml"
+            sh "kubectl apply -f front-svc.yml"
+
+            def serviceName = 'angular-service' 
+            def maxRetries = 10
+            def retryCount = 0
+            def externalIP = ''
+
+            while (externalIP.isEmpty() && retryCount < maxRetries) {
+                // Check for the external IP of the Angular service
+                externalIP = sh(script: "kubectl get svc ${serviceName} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'", returnStdout: true).trim()
+                if (externalIP.isEmpty()) {
+                    echo "External IP for Angular service not found. Retrying in 30 seconds..."
+                    sleep time: 30, unit: 'SECONDS'
+                    retryCount++
+                }
+            }
+
+            if (externalIP) {
+                echo "External IP for Angular service: ${externalIP}"
+                // Display the link or perform further actions
+            } else {
+                error "External IP for Angular service not found after ${maxRetries} retries."
+            }
         }
+    }
+}
 
 }}   
