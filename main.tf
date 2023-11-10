@@ -3,12 +3,12 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "prod" {
-  name     = "dudaRessourceGroup"
+  name     = "lastRessourceGroup"
   location = "East US"
 }
 
 resource "azurerm_kubernetes_cluster" "prodk8s" {
-  name                = "dudaAKSCluster"
+  name                = "lastAKSCluster"
   location            = azurerm_resource_group.prod.location
   resource_group_name = azurerm_resource_group.prod.name
   dns_prefix          = "myaksdns"
