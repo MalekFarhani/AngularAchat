@@ -3,7 +3,7 @@ pipeline{
 environment {
         SERVICE_NAME = 'spring-boot-service' // The name of your NodePort service
         SERVICE_PORT = 8089 // The port on which your service is exposed
-        ANGULAR_SERVICE_FILE = 'src/app/shared/service/Reglement.service.ts' // The path to your Angular service file
+        ANGULAR_SERVICE_FILE = 'src/app/shared/Service/Reglement.service.ts' // The path to your Angular service file
     }
 stages{
    stage('clean workspace')
