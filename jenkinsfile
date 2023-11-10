@@ -40,24 +40,31 @@ stages{
                     sh "kubectl get services" 
                     }}
     stage('Get Spring Boot Service External IP') {
-            steps {
-                script {
-                    def serviceName = 'spring-boot-service' // Name of your Spring Boot service
-                   // def namespace = 'default' // Namespace where your service is deployed
+    steps {
+        script {
+            def serviceName = 'spring-boot-service' // Name of your Spring Boot service
+            def externalIP = ''
+            def maxRetries = 10
+            def retryCount = 0
 
-                    // Retrieve the external IP address
-                    def externalIP = sh(script: "kubectl get svc ${serviceName} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'", returnStdout: true).trim()
-                    //def externalIP = sh(script: "kubectl get svc ${serviceName} -n ${namespace} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'", returnStdout: true).trim()
-                    if (externalIP) {
-                        echo "External IP for Spring Boot service: ${externalIP}"
-
-                        // Replace "localhost" with the external IP in myfile.txt
-                        sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Reglement.service.ts"
-                    } else {
-                        error "External IP for Spring Boot service not found"
-                    }
+            while (externalIP.isEmpty() && retryCount < maxRetries) {
+                externalIP = sh(script: "kubectl get svc ${serviceName} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'", returnStdout: true).trim()
+                if (externalIP.isEmpty()) {
+                    echo "External IP not found. Retrying in 30 seconds..."
+                    sleep time: 30, unit: 'SECONDS'
+                    retryCount++
                 }
-            }}
+            }
+
+            if (externalIP) {
+                echo "External IP for Spring Boot service: ${externalIP}"
+                sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Reglement.service.ts"
+            } else {
+                error "External IP for Spring Boot service not found after ${maxRetries} retries."
+            }
+        }
+    }
+}
 
     stage('docker'){
         steps{ 
