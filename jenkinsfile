@@ -81,7 +81,7 @@ stages{
                 sh 'docker build . -t malekkkk/achatang:2.0'  
              }    
         }
-    
+   // Due to the Cost of the ressource i changed it back to dockerhub 
     stage('ACR login'){
         steps {
                 withCredentials([string(credentialsId: 'dockerhu', variable: 'dockerhubpwd')]) {      
