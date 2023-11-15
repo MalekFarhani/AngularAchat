@@ -9,7 +9,7 @@ stages{
                  }
         } 
 
-    stage('pulling the code')
+    stage('Pulling the code From Github')
         {
             steps{
                 git branch: 'prod', 
@@ -17,7 +17,7 @@ stages{
                  }   
         }
     
-    stage('Aks Provisioning with Terraform') {
+    stage('AKS Provisioning with Terraform') {
             steps {
                     sh "chmod +x setup-aks.sh"
                     sh "./setup-aks.sh" 
@@ -37,7 +37,7 @@ stages{
                     sh "kubectl get services" 
                    }} 
    
-    stage('Get Spring Boot Service External IP') {
+    stage('Get The Backend Service URL') {
     steps {
         script {
             def serviceName = 'spring-boot-service' // Name of your Spring Boot service
@@ -54,7 +54,13 @@ stages{
                 }
             }
 
-            if (externalIP) {
+           
+        }
+    }
+}
+    stage('Update Frontend files'){
+        steps{ 
+                if (externalIP) {
                 echo "External IP for Spring Boot service: ${externalIP}"
                 sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Facture.service.ts"
                 sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Operateur.service.ts"
@@ -63,33 +69,33 @@ stages{
                 sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Secteur-activite.service.ts"
                 sh "sed -i 's|localhost|${externalIP}|g' src/app/shared/Service/Stock.service.ts"
                 sh 'cat src/app/shared/Service/Stock.service.ts'
-            } else {
+            } 
+            else {
                 error "External IP for Spring Boot service not found after ${maxRetries} retries."
-            }
+            } 
+             }    
         }
-    }
-}
 
-    stage('docker'){
+    stage('Building the Update Frontend App'){
         steps{ 
                 sh 'docker build . -t malekkkk/achatang:2.0'  
              }    
         }
     
-    stage('docker login'){
+    stage('ACR login'){
         steps {
                 withCredentials([string(credentialsId: 'dockerhu', variable: 'dockerhubpwd')]) {      
                         sh "echo \$dockerhubpwd | docker login -u malekkkk --password-stdin"}
               }
         }
    
-    stage ('docker push'){
+    stage ('Pushing the Image To ACR'){
         steps{
             sh 'docker push malekkkk/achatang:2.0'  
              }
         }
 
-   stage('angular') {
+   stage('Deploying Frontend To AKS') {
     steps {
         script {
             sh "kubectl apply -f front-dep.yml"
@@ -110,14 +116,20 @@ stages{
                 }
             }
 
-            if (externalIP) {
-                echo "External IP for Angular service: http://${externalIP}:80"
-                
-            } else {
-                error "External IP for Angular service not found after ${maxRetries} retries."
-            }
+           
         }
     }
 }
 
+        stage ('The Application URL'){
+            steps {
+                 if (externalIP) {
+                echo "External IP for Angular service: http://${externalIP}:80"
+                
+                     } 
+            else {
+                error "External IP for Angular service not found after ${maxRetries} retries."
+            }
+            }
+        }
 }}   
