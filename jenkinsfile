@@ -2,14 +2,14 @@ pipeline{
     agent any
 
 stages{
-    stage('clean workspace')
+    stage('Cleaning The Workspace')
         {
             steps{
                 cleanWs()
                  }
         } 
 
-    stage('pulling the code')
+    stage('Pulling the code from Github')
         {
             steps{
                 git branch: 'dev', 
@@ -17,7 +17,7 @@ stages{
                  }   
         }
     
-stage("install")
+stage("Installing Dependencies")
         {
             steps{
             sh "npm install"
@@ -36,7 +36,7 @@ stage("install")
                  }
         } 
     
-    stage("build"){
+    stage("Run Build & Zip the dist "){
             steps {
             sh "CI=false npm run build"
             sh "ls -l"
@@ -44,7 +44,7 @@ stage("install")
                   }
         }
 
-    stage('Publish to Nexus') {
+    stage('Deploying to Nexus nginx.conf & build.zip') {
             steps {
                 nexusArtifactUploader artifacts: [
                     [
@@ -72,20 +72,20 @@ stage("install")
                  }
         }
 
-    stage('docker'){
+    stage('Building The Image'){
         steps{ 
                 sh 'docker build . -t malekkkk/achatfdev:1.0'  
              }    
         }
 
-    stage('docker login'){
+    stage('DockerHub Login'){
         steps {
                 withCredentials([string(credentialsId: 'dockerhu', variable: 'dockerhubpwd')]) {      
                         sh "echo \$dockerhubpwd | docker login -u malekkkk --password-stdin"}
               }
         }
 
-    stage ('docker push'){
+    stage ('Pushing the Image to The Repo'){
         steps{
             sh 'docker push malekkkk/achatfdev:1.0'  
              }
