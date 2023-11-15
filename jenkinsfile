@@ -2,7 +2,7 @@ pipeline{
     agent any
 
 stages{
-   stage('clean workspace')
+   stage('Clean The Workspace')
         {
             steps{
                 cleanWs()
@@ -76,7 +76,7 @@ stages{
              }    
         }
 
-    stage('Building the Update Frontend App'){
+    stage('Building the Updated Frontend App'){
         steps{ 
                 sh 'docker build . -t malekkkk/achatang:2.0'  
              }    
