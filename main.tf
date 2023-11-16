@@ -3,12 +3,12 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "prod" {
-  name     = "MalekFRRessourceGroup"
+  name     = "MalekRessourceGroup"
   location = "East US"
 }
 
 resource "azurerm_kubernetes_cluster" "prodk8s" {
-  name                = "MalekFRAKSCluster"
+  name                = "MalekAKSCluster"
   location            = azurerm_resource_group.prod.location
   resource_group_name = azurerm_resource_group.prod.name
   dns_prefix          = "myaksdns"
