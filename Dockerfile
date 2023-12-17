@@ -1,5 +1,11 @@
 FROM nginx:1.21 
 
+WORKDIR /usr/share/nginx/html
+
+RUN groupadd -r malek && useradd -r -g malek malek
+RUN chown -R malek:malek /usr/share/nginx/html
+USER malek
+
 RUN apt-get update && apt-get install unzip -y && apt-get install curl -y
 
 RUN curl -o app.zip -L "http://192.168.222.133:8081/repository/achatfront/achatconfig/front-build/1.0.0/front-build-1.0.0.achat.zip" && \
