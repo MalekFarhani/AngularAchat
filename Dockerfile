@@ -2,9 +2,6 @@ FROM node:14 AS build
 
 WORKDIR /app
 
-RUN groupadd -r malek && useradd -r -g malek malek
-RUN chown -R malek:malek /app
-USER malek
 
 COPY package.json package-lock.json ./
 RUN npm install
